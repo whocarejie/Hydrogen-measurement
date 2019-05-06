@@ -1,0 +1,195 @@
+#include "rtc.h"
+#include "stm32f10x_rtc.h"
+#include "stm32f10x_bkp.h"
+#include "bsp_usart1.h"
+_calendar_obj calendar;    //?????
+//????????
+const u8 mon_table[12]={31,28,31,30,31,30,31,31,30,31,30,31};
+/*rtc??????*/
+
+
+void RTC_Configuration(void)
+
+{
+    /* ??PWR?BKP?? */
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR|RCC_APB1Periph_BKP,ENABLE);
+    /* ??????????? */ 
+    PWR_BackupAccessCmd(ENABLE);
+    /* ??BKP??? */ 
+    BKP_DeInit();
+    /* ??LSE */ 
+    RCC_LSEConfig(RCC_LSE_ON);
+    /*?????? */
+    while (RCC_GetFlagStatus(RCC_FLAG_LSERDY) == RESET) {}
+    /* ? RTC?????LSE??32.768KHZ???*/ 
+    RCC_RTCCLKConfig(RCC_RTCCLKSource_LSE);
+    /* ??RTC Clock */ 
+    RCC_RTCCLKCmd(ENABLE);
+    /* ???? */ 
+    RTC_WaitForSynchro();
+    /* ???RTC???????????*/             
+    RTC_WaitForLastTask();
+    /* ???????: ??RTC?????1s */
+    RTC_SetPrescaler(32767); /* RTC period = RTCCLK/RTC_PR = (32.768 KHz)/(32767+1)*/
+    /* ???RTC??????????? */
+    RTC_WaitForLastTask();
+    /* ??RTC??? */ 
+    RTC_ITConfig(RTC_IT_SEC, ENABLE);
+    /* ???RTC??????????? */         
+    RTC_WaitForLastTask();
+}
+
+void RTC_Init(void)
+{
+    /*??????????,???RCC_Configuration()????*/
+    if(BKP_ReadBackupRegister(BKP_DR1)!=0x1016)
+    {
+            RTC_Configuration();
+            RTC_Set(2019,5,11,9,7,55);
+            GPIO_SetBits(GPIOD, GPIO_Pin_13);//??D1
+            BKP_WriteBackupRegister(BKP_DR1, 0x1016);//??????????????????
+    }
+    else
+    {
+        RTC_WaitForSynchro();//??RTC???????
+        RTC_ITConfig(RTC_IT_SEC, ENABLE);//??RTC???
+        RTC_WaitForLastTask();//???????RTC?????????
+        GPIO_SetBits(GPIOG, GPIO_Pin_14);//??D2
+    }
+    NVIC_Configuration();
+    RTC_Get();
+}
+u8 Is_Leap_Year(u16 pyear)
+{
+    if(pyear%4==0)//?????4??
+    {
+        if(pyear%100==0)
+        {
+            if(pyear%400==0)    return 1;//???00??,????400??
+            else    return 0;
+        }
+        else
+            return 1;
+    }
+    else
+        return 0;
+}
+/*
+*????
+*???????????
+*?1970?1?1????
+*1970~2099??????
+???:0,??;??:??
+*/
+u8 RTC_Set(u16 year,u8 mon,u8 day,u8 hour,u8 min,u8 sec)
+{
+    u16 t;
+    u32 secCount=0;
+    if(year<1970||year>2099)
+        return 1;//³ö´í
+    for(t=1970;t<year;t++)    //??????????
+    {
+        if(Is_Leap_Year(t))//??
+            secCount+=31622400;//??????
+        else
+            secCount+=31536000;    
+    }
+    mon-=1;//??????????(????5?10?,??????4?????,???10?,??????)
+    for(t=0;t<mon;t++)
+    {
+        secCount+=(u32)mon_table[t]*86400;//???????
+        if(Is_Leap_Year(year)&&t==1)
+            secCount+=86400;//??,2??????????
+    }
+    
+    secCount+=(u32)(day-1)*86400;//???????????(???????,??-1)
+    secCount+=(u32)hour*3600;//?????
+    secCount+=(u32)min*60;//?????
+    secCount+=sec;
+//    RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR    | RCC_APB1Periph_BKP,ENABLE);
+//    PWR_BackupAccessCmd(ENABLE);
+    RTC_SetCounter(secCount);//??RTC?????
+    RTC_WaitForLastTask();    //???????RTC?????????
+    RTC_Get();//????
+    return 0;
+}
+
+/*
+???????
+????0,??????
+*/
+u8 RTC_Get(void)
+{
+        static u16 dayCount=0;
+        u32 secCount=0;
+        u32 tmp=0;
+        u16 tmp1=0;
+        secCount=RTC_GetCounter();
+        tmp=secCount/86400;//????
+        if(dayCount!=tmp)//????
+        {
+            dayCount=tmp;
+            tmp1=1970;//?1970???
+            while(tmp>=365)
+            {
+                if(Is_Leap_Year(tmp1))//???
+                {
+                    if(tmp>=366)    
+                        tmp-=366;//???????
+                    else
+                    {
+                    //    tmp1++;
+                        break;
+                    }
+                }
+                else
+                    tmp-=365;//??
+                tmp1++;
+            }
+            calendar.w_year=tmp1;//????
+            tmp1=0;
+            while(tmp>=28)//?????
+            {
+                if(Is_Leap_Year(calendar.w_year)&&tmp1==1)
+                {
+                    if(tmp>=29)    
+                        tmp-=29;
+                    else
+                        break;
+                }
+                else
+                {
+                    if(tmp>=mon_table[tmp1])//??
+                        tmp-=mon_table[tmp1];
+                    else
+                        break;
+                }
+                tmp1++;
+            }
+            calendar.w_month=tmp1+1;//????,tmp1=0??1?,????1
+            calendar.w_date=tmp+1;    //????,?????????,??tmp??????,??????????????
+        }
+        tmp=secCount%86400;//?????
+        calendar.hour=tmp/3600;//??
+        calendar.min=(tmp%3600)/60;//??
+        calendar.sec=(tmp%3600)%60;//?
+        return 0;
+}
+/*
+RTC????
+??????
+*/
+void RTC_IRQHandler(void)
+{         
+    if (RTC_GetITStatus(RTC_IT_SEC) != RESET)//????
+    {                            
+        RTC_Get();//????
+      
+     }
+    if(RTC_GetITStatus(RTC_IT_ALR)!= RESET)//????
+    {
+        RTC_ClearITPendingBit(RTC_IT_ALR);//?????        
+    }                                                    
+    RTC_ClearITPendingBit(RTC_IT_SEC|RTC_IT_OW);//?????
+    RTC_WaitForLastTask();                                                   
+}

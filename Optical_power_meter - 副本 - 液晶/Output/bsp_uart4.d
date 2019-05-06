@@ -1,0 +1,13 @@
+..\..\output\bsp_uart4.o: ..\..\User\usart\bsp_uart4.c
+..\..\output\bsp_uart4.o: ..\..\User\usart\bsp_uart4.h
+..\..\output\bsp_uart4.o: ..\..\Libraries\CMSIS\stm32f10x.h
+..\..\output\bsp_uart4.o: ..\..\Libraries\CMSIS\core_cm3.h
+..\..\output\bsp_uart4.o: D:\Keil_v5\ARM\ARMCC\bin\..\include\stdint.h
+..\..\output\bsp_uart4.o: ..\..\Libraries\CMSIS\system_stm32f10x.h
+..\..\output\bsp_uart4.o: ..\..\User\stm32f10x_conf.h
+..\..\output\bsp_uart4.o: ..\..\Libraries\FWlib\inc\stm32f10x_gpio.h
+..\..\output\bsp_uart4.o: ..\..\Libraries\CMSIS\stm32f10x.h
+..\..\output\bsp_uart4.o: ..\..\Libraries\FWlib\inc\stm32f10x_rcc.h
+..\..\output\bsp_uart4.o: ..\..\Libraries\FWlib\inc\stm32f10x_usart.h
+..\..\output\bsp_uart4.o: ..\..\Libraries\FWlib\inc\misc.h
+..\..\output\bsp_uart4.o: D:\Keil_v5\ARM\ARMCC\bin\..\include\stdio.h

@@ -1,0 +1,44 @@
+#include "APP.h"
+#include "bsp_usart1.h"
+#include <math.h>
+
+Power power;
+
+void dataInit(void)
+{
+}
+
+void send_power(void)
+{
+	unsigned int i;
+	for(i=0; i<6; i++){
+		printf("%c",powerData[i]);	
+	}
+}
+
+void receive_power(uint8_t receive)
+{
+	static uint16_t count = 0;
+	uint16_t i;
+	uint8_t receiveData[30];
+	if(receive == 0xAA)	
+		count = 0;
+	receiveData[count++] = receive;
+	if(count == 30){
+		if(receiveData[0]==0xAA && receiveData[1]==0x55){
+			__nop();
+			for(i=0; i<3; i++){
+				powerCh1[i] = receiveData[i+11];
+				powerCh2[i] = receiveData[i+17];
+				powerData1[i] = (int) powerCh1[i];
+				powerData2[i] = (int) powerCh2[i];
+			}
+		}
+	}
+}
+
+void powerCaculate(void)
+{
+	
+}
+

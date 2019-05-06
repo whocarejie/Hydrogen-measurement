@@ -1,0 +1,14 @@
+..\..\output\buzzer.o: ..\..\User\buzzer.c
+..\..\output\buzzer.o: ..\..\User\buzzer.h
+..\..\output\buzzer.o: ..\..\Libraries\CMSIS\stm32f10x.h
+..\..\output\buzzer.o: ..\..\Libraries\CMSIS\core_cm3.h
+..\..\output\buzzer.o: C:\Keil_v5\ARM\ARMCC\bin\..\include\stdint.h
+..\..\output\buzzer.o: ..\..\Libraries\CMSIS\system_stm32f10x.h
+..\..\output\buzzer.o: ..\..\User\stm32f10x_conf.h
+..\..\output\buzzer.o: ..\..\Libraries\FWlib\inc\stm32f10x_exti.h
+..\..\output\buzzer.o: ..\..\Libraries\CMSIS\stm32f10x.h
+..\..\output\buzzer.o: ..\..\Libraries\FWlib\inc\stm32f10x_fsmc.h
+..\..\output\buzzer.o: ..\..\Libraries\FWlib\inc\stm32f10x_gpio.h
+..\..\output\buzzer.o: ..\..\Libraries\FWlib\inc\stm32f10x_rcc.h
+..\..\output\buzzer.o: ..\..\Libraries\FWlib\inc\stm32f10x_usart.h
+..\..\output\buzzer.o: ..\..\Libraries\FWlib\inc\misc.h

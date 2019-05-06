@@ -1,0 +1,15 @@
+..\..\output\usart4.o: ..\..\User\usart4.c
+..\..\output\usart4.o: ..\..\User\usart4.h
+..\..\output\usart4.o: ..\..\Libraries\CMSIS\stm32f10x.h
+..\..\output\usart4.o: ..\..\Libraries\CMSIS\core_cm3.h
+..\..\output\usart4.o: C:\Keil_v5\ARM\ARMCC\bin\..\include\stdint.h
+..\..\output\usart4.o: ..\..\Libraries\CMSIS\system_stm32f10x.h
+..\..\output\usart4.o: ..\..\User\stm32f10x_conf.h
+..\..\output\usart4.o: ..\..\Libraries\FWlib\inc\stm32f10x_exti.h
+..\..\output\usart4.o: ..\..\Libraries\CMSIS\stm32f10x.h
+..\..\output\usart4.o: ..\..\Libraries\FWlib\inc\stm32f10x_fsmc.h
+..\..\output\usart4.o: ..\..\Libraries\FWlib\inc\stm32f10x_gpio.h
+..\..\output\usart4.o: ..\..\Libraries\FWlib\inc\stm32f10x_rcc.h
+..\..\output\usart4.o: ..\..\Libraries\FWlib\inc\stm32f10x_usart.h
+..\..\output\usart4.o: ..\..\Libraries\FWlib\inc\misc.h
+..\..\output\usart4.o: C:\Keil_v5\ARM\ARMCC\bin\..\include\stdio.h
